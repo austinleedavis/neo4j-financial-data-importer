@@ -32,8 +32,8 @@ public class Neo4jUtility {
 	
 
 	static Path getImportFolderPath(String database) {
-    	var importQuery = "Call dbms.listConfig() YIELD name, value WHERE name='dbms.directories.import' RETURN value";
-    	var homeQuery = "Call dbms.listConfig() YIELD name, value WHERE name='dbms.directories.neo4j_home' RETURN value";
+    	var importQuery = "Call dbms.listConfig() YIELD name, value WHERE name='directories.import' RETURN value";
+    	var homeQuery = "Call dbms.listConfig() YIELD name, value WHERE name='directories.neo4j_home' RETURN value";
     	
 		try (var transaction = getDriver().session(SessionConfig.forDatabase(database)).beginTransaction()) {
 			String importFolderName = transaction.run(importQuery).next().values().get(0).asString();
