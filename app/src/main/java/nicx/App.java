@@ -96,7 +96,7 @@ public class App {
 
 		response=response.toLowerCase();
 
-		if(response =="yes") {
+		if(response.equals("yes")) {
 			System.out.println("Reset confirmed.");
 			return true;
 		}
