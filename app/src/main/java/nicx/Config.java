@@ -20,6 +20,11 @@ public enum Config {
 	}
 	
 	public enum Arg {
+
+		HELP(Option.builder("h")
+		.longOpt("help")
+		.build()),
+
 		DB(Option.builder("db")
 		.required()
 		.hasArg()
@@ -47,7 +52,7 @@ public enum Config {
 		.build()),
 		
 		RESET(Option.builder("reset")
-		.desc("Completely clears the database before. This occurs prior to running any other command.")
+		.desc("DANGER! Completely clears the database. This occurs prior to running any other command.")
 		.build()),
 		
 		DOWNLOAD_ALL(Option.builder("d")

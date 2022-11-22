@@ -3,14 +3,14 @@
  */
 package nicx;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
+
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 
 import nicx.Config.Arg;
@@ -20,16 +20,30 @@ public class App {
 	
 	public static void main(String[] args) {
 		
-        Options options = buildOptions();
-        CommandLineParser parser = new DefaultParser();
-        		
+        var helpOption = new Options().addOption(Arg.HELP.getOption());
+		var options = buildOptions(); 
+
+        var parser = new ExtendedParser();
+
         try {
-        	CommandLine cl = parser.parse(options, args);
-        	
-        	Config.INSTANCE.load(cl);
+        	var cl = parser.parse(helpOption, args,false);
+
+			if(cl.hasOption(Arg.HELP.getOpt())){
+				String header = "Provides financial and legal entity data to a running Neo4j instance.";
+				String footer = "\nPlease report issues at github.com/austinleedavis/neo4j-financial-data-importer/issues";
+
+				var formatter = new HelpFormatter();
+				formatter.printHelp("java -jar n4jfindat.jar",header,options,footer,true);
+				return;
+			}
+
+			cl = parser.parse(options, args);
+
+			Config.INSTANCE.load(cl);
         	
         	if(cl.hasOption(Arg.RESET.getOpt())) {
-        		clearDatabase();
+				if(confirmReset())
+        			clearDatabase();
         	}
         	
         	if(cl.hasOption(Arg.DOWNLOAD_ALL.getOpt())) {
@@ -64,6 +78,37 @@ public class App {
 		}
 		
     }
+	
+
+	private static boolean confirmReset(){
+		var c = System.console();
+
+		if(c == null){
+			System.err.println("Unable to confirm database reset: No console");
+			System.exit(-1);
+		}
+
+		String response = c.readLine("You are about to erase the database. This action cannot be undone. Do you wish to continue? (default: no) [yes/no] ");
+
+		if(response == null) {
+			System.out.println("No response given. Closing application.");
+			System.exit(0);
+		}
+
+		response=response.toLowerCase();
+
+		if(response =="yes") {
+			System.out.println("Reset confirmed.");
+			return true;
+		}
+
+		System.out.println("Reset cancelled. Remove the -reset option and try again.");
+
+		System.exit(0);
+
+		return false;
+			
+	}
 	
 	private static Options buildOptions() {
 		
