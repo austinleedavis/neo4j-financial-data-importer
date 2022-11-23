@@ -23,7 +23,7 @@ public interface DownloadableDataSource {
     	
     	var targetDirectory = Neo4jUtility.getImportFolderPath(database).toString();
     	var zipFilePath = Path.of(targetDirectory,this+".ZIP");
-
+		
     	try (ReadableByteChannel rbc = Channels.newChannel(new URL(this.getDataFileUrl()).openStream());
     			FileOutputStream fos = new FileOutputStream(zipFilePath.toString());){
     		
@@ -31,14 +31,17 @@ public interface DownloadableDataSource {
 	    	
     	} catch (MalformedURLException e) {
     		e.printStackTrace();
+			System.exit(-1);
 		} catch (IOException e) {
 			e.printStackTrace();
+			System.exit(-1);
 		} 
     	
     	try {
 			UnzipUtility.unzip(zipFilePath.toString(), targetDirectory,this.getDestinationFilename());
 		} catch (IOException e) {
 			e.printStackTrace();
+			System.exit(-1);
 		}
     	
 		

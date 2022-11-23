@@ -38,7 +38,11 @@ public class Neo4jUtility {
 		try (var transaction = getDriver().session(SessionConfig.forDatabase(database)).beginTransaction()) {
 			String importFolderName = transaction.run(importQuery).next().values().get(0).asString();
 			String homeFolderName = transaction.run(homeQuery).next().values().get(0).asString();
-			return Path.of(homeFolderName,importFolderName);
+
+			if(System.getProperty("os.name").startsWith("Win"))
+				return Path.of(homeFolderName,importFolderName);
+			else 
+				return Path.of(importFolderName);
 		}
     }
 	
